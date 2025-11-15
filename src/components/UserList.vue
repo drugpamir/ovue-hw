@@ -23,13 +23,26 @@ const USERS = ref([
     birthDate: new Date(1995, 5, 21)
   },
 ])
+
+const userListIsVisible = ref(true)
+
+function toggleUserList() {
+  userListIsVisible.value = !userListIsVisible.value;
+}
+
 </script>
 
 <template>
   <div class="wrapper">
-    Список пользователей:
+    <span>Список пользователей:</span>
+    <button
+        class="btn-toggle-list"
+        @click=toggleUserList
+    >
+      {{ userListIsVisible ? "Скрыть" : "Показать" }}
+    </button>
   </div>
-  <ul class="user-list">
+  <ul v-if="userListIsVisible" class="user-list">
     <li class="user-list__item" v-for="user in USERS" :key="user.id">
       <User
           :first-name="user.firstName"
@@ -38,6 +51,7 @@ const USERS = ref([
       />
     </li>
   </ul>
+  <div v-else>Список пользователей скрыт!</div>
 </template>
 
 <style scoped>
@@ -64,5 +78,22 @@ const USERS = ref([
 
 .user-list__item:last-child {
   border-bottom: none;
+}
+
+.btn-toggle-list {
+  margin-left: 10px;
+  min-width: 80px;
+  padding: 0.3rem 0.8rem;
+  background-color: #1d4ed8;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.btn-toggle-list:hover {
+  background-color: #2563eb;
 }
 </style>
