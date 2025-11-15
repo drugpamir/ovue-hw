@@ -14,15 +14,20 @@ const age = computed(() => {
 
 const showAddInfo = ref(false)
 
+const onUsernameMouseEnter = ref(false)
+
 function handleShowAddInfo() {
   showAddInfo.value = !showAddInfo.value
 }
-
 </script>
 
 <template>
   <div class="user">
-    <span class="user-name">
+    <span
+        :class="{ user_name: true, user_name__on_mouse_enter: onUsernameMouseEnter }"
+        @mouseenter="onUsernameMouseEnter=true"
+        @mouseleave="onUsernameMouseEnter=false"
+    >
       {{ lastName }} {{ firstName }}
     </span>
     <span v-show="showAddInfo">
@@ -44,10 +49,14 @@ function handleShowAddInfo() {
   gap: 0.4rem;
 }
 
-.user-name {
+.user_name {
   font-weight: 500;
   font-size: 1rem;
   margin-bottom: 0.3rem;
+}
+
+.user_name__on_mouse_enter {
+  color: darkgreen;
 }
 
 .btn-toggle {
