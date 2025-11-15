@@ -13,12 +13,9 @@ const age = computed(() => {
 })
 
 const showAddInfo = ref(false)
+const handleShowAddInfo = () => showAddInfo.value = !showAddInfo.value
 
 const onUsernameMouseEnter = ref(false)
-
-function handleShowAddInfo() {
-  showAddInfo.value = !showAddInfo.value
-}
 </script>
 
 <template>
@@ -30,7 +27,7 @@ function handleShowAddInfo() {
     >
       {{ lastName }} {{ firstName }}
     </span>
-    <span v-show="showAddInfo">
+    <span v-show="showAddInfo" class="user_additional-info">
       Дата рождения: {{ birthDate.toLocaleDateString() }}, возраст: {{ age }})
     </span>
     <button
@@ -57,6 +54,11 @@ function handleShowAddInfo() {
 
 .user_name__on_mouse_enter {
   color: darkgreen;
+}
+
+.user_additional-info {
+  margin-left: auto;
+  color: #555;
 }
 
 .btn-toggle {
