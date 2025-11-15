@@ -25,10 +25,7 @@ const USERS = ref([
 ])
 
 const userListIsVisible = ref(true)
-
-function toggleUserList() {
-  userListIsVisible.value = !userListIsVisible.value;
-}
+const toggleUserList = () => userListIsVisible.value = !userListIsVisible.value
 
 </script>
 
