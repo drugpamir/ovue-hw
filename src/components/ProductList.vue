@@ -10,12 +10,13 @@ async function fetchProducts() {
   loading.value = true;
   try {
     const response = await fetch('https://fakestoreapi.com/products');
-    if (!response.ok) {
-      console.log(`Ошибка загрузки продуктов: ${response.status}`);
+    if (response.ok) {
+      products.value = await response.json();
+    } else {
+      error.value = `Ошибка загрузки продуктов (код ответа ${response.status})`;
     }
-    products.value = await response.json();
   } catch (err) {
-    error.value = err.message;
+    error.value = `Неизвестная ошибка при загрузке продуктов: ${err.message}`;
   } finally {
     loading.value = false;
   }
@@ -27,9 +28,10 @@ onMounted(fetchProducts)
 <template>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
-  <div class="products-grid">
+  <div v-if="products.length" class="products-grid">
     <Product v-for="product in products" :key="product.id" v-bind="product"/>
   </div>
+  <p v-else>Список продуктов пуст!</p>
 </template>
 
 <style scoped>
