@@ -2,16 +2,16 @@
 import {onMounted, ref} from "vue";
 import Product from "@/components/Product.vue";
 
-const products = ref([]);       // массив продуктов
-const error = ref(null);        // для ошибок
-const loading = ref(true);      // индикатор загрузки
+const products = ref([]);
+const error = ref(null);
+const loading = ref(true);
 
 async function fetchProducts() {
   loading.value = true;
   try {
     const response = await fetch('https://fakestoreapi.com/products');
     if (!response.ok) {
-      throw new Error(`Ошибка HTTP: ${response.status}`);
+      console.log(`Ошибка загрузки продуктов: ${response.status}`);
     }
     products.value = await response.json();
   } catch (err) {
@@ -28,7 +28,7 @@ onMounted(fetchProducts)
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
   <div class="products-grid">
-    <Product v-for="product in products" :key="product.id" v-bind="product" />
+    <Product v-for="product in products" :key="product.id" v-bind="product"/>
   </div>
 </template>
 
