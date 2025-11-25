@@ -1,26 +1,7 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted} from "vue";
 import Product from "@/components/Product.vue";
-
-const products = ref([]);
-const error = ref(null);
-const loading = ref(true);
-
-async function fetchProducts() {
-  loading.value = true;
-  try {
-    const response = await fetch('https://fakestoreapi.com/products');
-    if (response.ok) {
-      products.value = await response.json();
-    } else {
-      error.value = `Ошибка загрузки продуктов (код ответа ${response.status})`;
-    }
-  } catch (err) {
-    error.value = `Неизвестная ошибка при загрузке продуктов: ${err.message}`;
-  } finally {
-    loading.value = false;
-  }
-}
+import {error, fetchProducts, loading, products} from "@/components/ProductService.js";
 
 onMounted(fetchProducts)
 </script>
