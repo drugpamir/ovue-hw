@@ -1,11 +1,15 @@
 <script setup>
-defineProps({
+import {computed} from "vue";
+
+const props = defineProps({
   id: Number,
   title: String,
   price: Number,
   description: String,
   category: String,
 })
+
+const priceRounded = computed(() => props.price.toFixed(2))
 </script>
 
 <template>
@@ -13,7 +17,7 @@ defineProps({
     <div class="product-info">
       <h3 class="product-title">{{ title }}</h3>
       <p class="product-category">{{ category }}</p>
-      <p class="product-price">{{ price.toFixed(2) }}₽</p>
+      <p class="product-price">{{ priceRounded }}₽</p>
     </div>
   </div>
 </template>
