@@ -1,29 +1,46 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, reactive} from "vue";
 import Product from "@/components/Product.vue";
 import SearchProduct from "@/components/SearchProduct.vue";
 import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
 
 onMounted(fetchProducts)
 
-const filteredProducts = ref(products.value)
+const filters = reactive({
+  productTitle: '',
+  productMinPrice: 0,
+  productMaxPrice: 100000
+})
 
-function onSearchProduct(productTitle, productMinPrice, productMaxPrice) {
-  filteredProducts.value = products.value.filter((p) =>
-      (!productTitle.value.length || p.value === productTitle.value)
-      && p.value > productMinPrice.value
-      && p.value < productMaxPrice.value)
+function onSearchProduct({title, minPrice, maxPrice}) {
+  console.log("Фильтры:", {productTitle: title, productMinPrice: minPrice, productMaxPrice: maxPrice})
+  console.log("Все продукты:", products.value)
+
+  filters.productTitle = title
+  filters.productMinPrice = minPrice
+  filters.productMaxPrice = maxPrice
 }
+
+const filteredProducts = computed(() => {
+  if (!products.value.length) {
+    return []
+  }
+  return products.value.filter((p) =>
+      (!filters.productTitle || p.title.toLowerCase().includes(filters.productTitle.toLowerCase())) &&
+      (p.price >= filters.productMinPrice) &&
+      (p.price <= filters.productMaxPrice)
+  )
+})
 </script>
 
 <template>
-  <SearchProduct @searchProduct="onSearchProduct"/>
-    <p v-if="loading">Загрузка продуктов...</p>
-    <p v-if="error">Ошибка: {{ error }}</p>
-    <div v-if="products.length" class="products-grid">
-      <Product v-for="product in products" :key="product.id" v-bind="product"/>
-    </div>
-    <p v-else>Список продуктов пуст!</p>
+  <SearchProduct @onFilterChange="onSearchProduct"/>
+  <p v-if="loading">Загрузка продуктов...</p>
+  <p v-if="error">Ошибка: {{ error }}</p>
+  <div v-if="filteredProducts.length" class="products-grid">
+    <Product v-for="product in filteredProducts" :key="product.id" v-bind="product"/>
+  </div>
+  <p v-else-if="!loading">Список продуктов пуст!</p>
 </template>
 
 <style scoped>
