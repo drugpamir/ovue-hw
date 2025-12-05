@@ -2,7 +2,7 @@
 import {onMounted, ref} from "vue";
 import Product from "@/components/Product.vue";
 import SearchProduct from "@/components/SearchProduct.vue";
-import {error, fetchProducts, loading, products} from "@/components/ProductService.js";
+import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
 
 onMounted(fetchProducts)
 

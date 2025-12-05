@@ -8,9 +8,10 @@ export const loading = ref(true);
 export async function fetchProducts() {
     loading.value = true;
     try {
-        const response = await fetch('https://fakestoreapi.com/products');
+        // const response = await fetch('https://fakestoreapi.com/products');
+        const response = await fetch('https://dummyjson.com/products');
         if (response.ok) {
-            products.value = await response.json();
+            products.value = await response.json().then(p => p.products ?? p);
         } else {
             error.value = `Ошибка загрузки продуктов (код ответа ${response.status})`;
         }
