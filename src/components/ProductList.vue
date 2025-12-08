@@ -3,6 +3,7 @@ import {computed, onMounted, reactive} from "vue";
 import Product from "@/components/Product.vue";
 import SearchProduct from "@/components/SearchProduct.vue";
 import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
+import MakeOrderPopup from "@/components/MakeOrderPopup.vue";
 
 onMounted(fetchProducts)
 
@@ -35,6 +36,7 @@ const filteredProducts = computed(() => {
 
 <template>
   <SearchProduct @onFilterChange="onSearchProduct"/>
+  <MakeOrderPopup/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
   <div v-if="filteredProducts.length" class="products-grid">
