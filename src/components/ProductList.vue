@@ -2,8 +2,9 @@
 import {computed, onMounted, reactive} from "vue";
 import Product from "@/components/Product.vue";
 import SearchProduct from "@/components/SearchProduct.vue";
-import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
+import {createProduct, error, fetchProducts, loading, products} from "@/composables/ProductService.js";
 import MakeOrderPopup from "@/components/MakeOrderPopup.vue";
+import CreateProductPopup from "@/components/CreateProductPopup.vue";
 
 onMounted(fetchProducts)
 
@@ -14,9 +15,6 @@ const filters = reactive({
 })
 
 function onSearchProduct({title, minPrice, maxPrice}) {
-  console.log("Фильтры:", {productTitle: title, productMinPrice: minPrice, productMaxPrice: maxPrice})
-  console.log("Все продукты:", products.value)
-
   filters.productTitle = title
   filters.productMinPrice = minPrice
   filters.productMaxPrice = maxPrice
@@ -32,11 +30,20 @@ const filteredProducts = computed(() => {
       (p.price <= filters.productMaxPrice)
   )
 })
+
+async function onProductCreated(ev) {
+  console.log('event:')
+  console.log(ev)
+  const createdProduct = await createProduct(ev)
+  console.log('created product:')
+  console.log(createdProduct)
+}
 </script>
 
 <template>
   <SearchProduct @onFilterChange="onSearchProduct"/>
   <MakeOrderPopup/>
+  <CreateProductPopup @on-created="onProductCreated($event)"/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
   <div v-if="filteredProducts.length" class="products-grid">

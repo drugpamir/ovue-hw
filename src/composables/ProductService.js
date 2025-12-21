@@ -21,3 +21,23 @@ export async function fetchProducts() {
         loading.value = false;
     }
 }
+
+export async function createProduct(product) {
+    loading.value = true;
+    try {
+        const response = await fetch('https://dummyjson.com/products/add', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(product)
+        });
+        if (response.ok) {
+            products.value = await response.json().then(p => [...products.value, p]);
+        } else {
+            error.value = `Ошибка создания продукта (код ответа ${response.status})`;
+        }
+    } catch (err) {
+        error.value = `Неизвестная ошибка при создании продуктов: ${err.message}`;
+    } finally {
+        loading.value = false;
+    }
+}
