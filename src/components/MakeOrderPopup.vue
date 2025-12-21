@@ -1,4 +1,5 @@
-<script setup>import { reactive, ref } from 'vue'
+<script setup>
+import {reactive, ref} from 'vue'
 
 const showPopup = ref(false)
 
@@ -8,6 +9,10 @@ const form = reactive({
   address: '',
   agreement: false,
 })
+
+function inputDataIsValid() {
+  return form.fullName.length > 5 && form.email.length > 10 && form.address.length > 10 && form.agreement
+}
 
 function submitOrder() {
   alert(`Заказ отправлен:\n${JSON.stringify(form, null, 2)}`)
@@ -46,7 +51,7 @@ function submitOrder() {
         </label>
 
         <div class="form-buttons">
-          <button type="submit" :disabled="!form.agreement">Отправить</button>
+          <button type="submit" :disabled="!inputDataIsValid">Отправить</button>
           <button type="button" @click="showPopup = false">Закрыть</button>
         </div>
       </form>
