@@ -1,63 +1,94 @@
 <script setup>
-import {reactive, ref} from 'vue'
+import {nextTick, ref} from 'vue'
+import {ErrorMessage, Field, useForm} from "vee-validate"
+import * as yup from 'yup'
 
 const showPopup = ref(false)
 
-const form = reactive({
-  fullName: '',
-  email: '',
-  address: '',
-  agreement: false,
+const schema = yup.object({
+  fullName: yup.string()
+      .min(6, 'ФИО должно содержать минимум 6 символов')
+      .required('ФИО обязательно'),
+  email: yup.string()
+      .email('Email должен быть корректным')
+      .required('Email обязателен'),
+  address: yup.string()
+      .min(11, 'Адрес должен содержать минимум 11 символов')
+      .required('Адрес обязателен'),
+  agreement: yup.string()
+      .required('Необходимо согласиться с правилами')
 })
 
-function inputDataIsValid() {
-  return form.fullName.length > 5 && form.email.length > 10 && form.address.length > 10 && form.agreement
+const initialValues = {fullName: '', email: '', address: '', agreement: false}
+
+const {handleSubmit, resetForm, meta} = useForm({
+  validationSchema: schema,
+  initialValues,
+})
+
+const emit = defineEmits(['makeOrder'])
+
+const onSubmit = handleSubmit((formValues) => {
+  alert(`Заказ отправлен:\n${JSON.stringify(formValues, null, 2)}`)
+  emit('makeOrder', formValues)
+  closePopup()
+})
+
+const resetFormData = () => {
+  resetForm({values: initialValues})  // Сбрасывает значения + ошибки
 }
 
-function submitOrder() {
-  alert(`Заказ отправлен:\n${JSON.stringify(form, null, 2)}`)
+async function openPopup() {
+  showPopup.value = true
+  await nextTick()
+  resetFormData()
+}
+
+function closePopup() {
   showPopup.value = false
-  form.fullName = ''
-  form.email = ''
-  form.address = ''
-  form.agreement = false
 }
 </script>
 
 <template>
-  <button @click="showPopup = true">Заказать</button>
-  <div v-if="showPopup" class="popup-overlay" @click.self="showPopup = false">
+  <button @click="openPopup">Заказать</button>
+
+  <div v-show="showPopup" class="popup-overlay" @click.self="closePopup">
     <div class="popup-content">
-      <h2 class="popup-header">Заказ</h2>
-      <form @submit.prevent="submitOrder">
+      <h2 class="popup-header">Данные для заказа</h2>
+      <form @submit="onSubmit">
         <label class="form-label">
           ФИО:
-          <input v-model="form.fullName" type="text" required />
+          <Field name="fullName" type="text"/>
+          <ErrorMessage name="fullName" class="error"/>
         </label>
 
         <label class="form-label">
           Email:
-          <input v-model="form.email" type="email" required />
+          <Field name="email" type="email"/>
+          <ErrorMessage name="email" class="error"/>
         </label>
 
         <label class="form-label">
-          Адрес (город, улица, дом):
-          <input v-model="form.address" type="text" required />
+          Адрес:
+          <Field name="address" type="text"/>
+          <ErrorMessage name="address" class="error"/>
         </label>
 
         <label class="popup-rules">
-          <input v-model="form.agreement" type="checkbox" required />
-          <span>Согласен с <a href="#">правилами</a></span>
+          <Field name="agreement" type="checkbox" value="false"/>
+          <span>Согласен с правилами</span>
+          <ErrorMessage name="agreement" class="error"/>
         </label>
 
         <div class="form-buttons">
-          <button type="submit" :disabled="!inputDataIsValid">Отправить</button>
-          <button type="button" @click="showPopup = false">Закрыть</button>
+          <button type="submit" :disabled="!meta.valid">Отправить</button>
+          <button type="button" @click="closePopup">Закрыть</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .popup-overlay {
@@ -66,7 +97,7 @@ function submitOrder() {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,8 +108,8 @@ function submitOrder() {
   background: #fff;
   padding: 1.5rem;
   border-radius: 8px;
-  width: 350px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  width: 550px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popup-header {
@@ -139,5 +170,12 @@ function submitOrder() {
 .form-buttons button[type="button"] {
   background: #6c757d;
   color: white;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 </style>
