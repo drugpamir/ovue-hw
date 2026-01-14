@@ -43,7 +43,7 @@ async function onProductCreated(ev) {
 <template>
   <SearchProduct @onFilterChange="onSearchProduct"/>
   <MakeOrderPopup/>
-  <CreateProductPopup @on-created="onProductCreated($event)"/>
+  <CreateProductPopup @createProduct="onProductCreated($event)"/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
   <div v-if="filteredProducts.length" class="products-grid">

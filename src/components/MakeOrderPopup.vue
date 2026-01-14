@@ -1,5 +1,5 @@
 <script setup>
-import {nextTick, ref} from 'vue'
+import {ref} from 'vue'
 import {ErrorMessage, Field, useForm} from "vee-validate"
 import * as yup from 'yup'
 
@@ -40,7 +40,6 @@ const resetFormData = () => {
 
 async function openPopup() {
   showPopup.value = true
-  await nextTick()
   resetFormData()
 }
 
@@ -52,7 +51,7 @@ function closePopup() {
 <template>
   <button @click="openPopup">Заказать</button>
 
-  <div v-show="showPopup" class="popup-overlay" @click.self="closePopup">
+  <div v-if="showPopup" class="popup-overlay" @click.self="closePopup">
     <div class="popup-content">
       <h2 class="popup-header">Данные для заказа</h2>
       <form @submit="onSubmit">
@@ -142,6 +141,13 @@ function closePopup() {
   cursor: pointer;
 }
 
+.error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
 .form-buttons {
   display: flex;
   gap: 0.8rem;
@@ -170,12 +176,5 @@ function closePopup() {
 .form-buttons button[type="button"] {
   background: #6c757d;
   color: white;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
 }
 </style>

@@ -1,65 +1,90 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {ref} from "vue";
+import * as yup from "yup";
+import {ErrorMessage, Field, useForm} from "vee-validate";
 
 const showPopup = ref(false)
 
-const form = reactive({
-  title: 'no title',
-  price: 0,
-  description: '',
-  category: 'unknown',
+const categories = ['unknown', 'beauty', 'fragrances', 'furniture', 'groceries']
+const schema = yup.object({
+  title: yup.string()
+      .min(4, 'Название товара должно содержать минимум 4 символа')
+      .required('Название товара обязательно'),
+  price: yup.number()
+      .min(0, 'Цена не может быть отрицательной')
+      .max(100_000, 'Товар не может быть дороже 1 млн руб.')
+      .required('Цена должна быть указана'),
+  description: yup.string()
+      .min(10, 'Описание должно содержать минимум 10 символов')
+      .required('Описание товара обязательно'),
+  category: yup.string()
+      .lowercase()
+      .oneOf(categories, `Варианты категорий: ${categories.join(', ')}`)
+      .required(`Одна из категорий должна быть указана: ${categories.join(', ')}`)
 })
 
-const emit = defineEmits(['onCreated'])
+const initialValues = {title: '', price: 0, description: '', category: 'unknown'}
 
-function inputDataIsValid() {
-  return form.title.length > 5 && form.price > 0 && form.description.length > 10 && form.category > 3
+const {handleSubmit, resetForm, meta} = useForm({
+  validationSchema: schema,
+  initialValues,
+})
+
+const emit = defineEmits(['createProduct'])
+
+const onSubmit = handleSubmit((formValues) => {
+  emit('createProduct', formValues)
+  closePopup()
+})
+
+const resetFormData = () => {
+  resetForm({values: initialValues})  // Сбрасывает значения + ошибки
 }
 
-function onSubmit() {
-  emit('onCreated', {
-    title: form.title,
-    price: form.price,
-    category: form.category,
-    description: form.description
-  })
+async function openPopup() {
+  showPopup.value = true
+  resetFormData()
+}
+
+function closePopup() {
   showPopup.value = false
-  form.title = 'no title'
-  form.price = 0
-  form.description = ''
-  form.category = 'unknown'
 }
 </script>
 
 <template>
-  <button @click="showPopup = true">Создать</button>
-  <div v-if="showPopup" class="popup-overlay" @click.self="showPopup = false">
+  <button @click="openPopup">Создать</button>
+
+  <div v-if="showPopup" class="popup-overlay" @click.self="closePopup">
     <div class="popup-content">
-      <h2 class="popup-header">Товар</h2>
-      <form @submit.prevent="onSubmit">
+      <h2 class="popup-header">Создание товара</h2>
+      <form @submit="onSubmit">
         <label class="form-label">
-          ФИО:
-          <input v-model="form.title" type="text" required/>
+          Название:
+          <Field name="title" type="text"/>
+          <ErrorMessage name="title" class="error"/>
         </label>
 
         <label class="form-label">
           Цена:
-          <input v-model="form.price" type="number" required/>
+          <Field name="price" type="number"/>
+          <ErrorMessage name="price" class="error"/>
         </label>
 
         <label class="form-label">
           Описание:
-          <input v-model="form.description" type="text" required/>
+          <Field name="description" type="text"/>
+          <ErrorMessage name="description" class="error"/>
         </label>
 
         <label class="form-label">
           Категория:
-          <input v-model="form.category" type="text" required/>
+          <Field name="category" type="text"/>
+          <ErrorMessage name="category" class="error"/>
         </label>
 
         <div class="form-buttons">
-          <button type="submit" :disabled="!inputDataIsValid">Отправить</button>
-          <button type="button" @click="showPopup = false">Закрыть</button>
+          <button type="submit" :disabled="!meta.valid">Отправить</button>
+          <button type="button" @click="closePopup">Закрыть</button>
         </div>
       </form>
     </div>
@@ -84,7 +109,7 @@ function onSubmit() {
   background: #fff;
   padding: 1.5rem;
   border-radius: 8px;
-  width: 350px;
+  width: 550px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -107,6 +132,13 @@ function onSubmit() {
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .form-buttons {
