@@ -32,11 +32,8 @@ const filteredProducts = computed(() => {
 })
 
 async function onProductCreated(ev) {
-  console.log('event:')
-  console.log(ev)
   const createdProduct = await createProduct(ev)
-  console.log('created product:')
-  console.log(createdProduct)
+  console.log(`created product: ${createdProduct}`)
 }
 </script>
 
