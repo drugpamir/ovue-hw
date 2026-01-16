@@ -5,6 +5,7 @@ import SearchProduct from "@/components/SearchProduct.vue";
 import {createProduct, error, fetchProducts, loading, products} from "@/composables/ProductService.js";
 import MakeOrderPopup from "@/components/MakeOrderPopup.vue";
 import CreateProductPopup from "@/components/CreateProductPopup.vue";
+import {makeOrder} from "@/composables/OrderService.js";
 
 onMounted(fetchProducts)
 
@@ -35,11 +36,15 @@ async function onProductCreated(ev) {
   const createdProduct = await createProduct(ev)
   console.log(`created product: ${createdProduct}`)
 }
+
+async function onMakeOrder(ev) {
+  await makeOrder(ev)
+}
 </script>
 
 <template>
   <SearchProduct @onFilterChange="onSearchProduct"/>
-  <MakeOrderPopup/>
+  <MakeOrderPopup @makeOrder="onMakeOrder($event)"/>
   <CreateProductPopup @createProduct="onProductCreated($event)"/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>

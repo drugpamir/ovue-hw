@@ -29,7 +29,6 @@ const {handleSubmit, resetForm, meta} = useForm({
 const emit = defineEmits(['makeOrder'])
 
 const onSubmit = handleSubmit((formValues) => {
-  alert(`Заказ отправлен:\n${JSON.stringify(formValues, null, 2)}`)
   emit('makeOrder', formValues)
   closePopup()
 })
