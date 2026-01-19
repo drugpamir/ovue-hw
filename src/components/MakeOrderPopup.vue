@@ -2,13 +2,19 @@
 import {ref} from 'vue'
 import {ErrorMessage, Field, useForm} from "vee-validate"
 import * as yup from 'yup'
+import {makeOrder} from "@/composables/OrderService.js";
 
 const showPopup = ref(false)
 
 const schema = yup.object({
-  fullName: yup.string()
-      .min(6, 'ФИО должно содержать минимум 6 символов')
+  lastName: yup.string()
+      .min(2, 'Фамилия должна содержать минимум 2 символа')
       .required('ФИО обязательно'),
+  firstName: yup.string()
+      .min(2, 'Имя должно содержать минимум 2 символа')
+      .required('ФИО обязательно'),
+  middleName: yup.string()
+      .optional(),
   email: yup.string()
       .email('Email должен быть корректным')
       .required('Email обязателен'),
@@ -19,17 +25,15 @@ const schema = yup.object({
       .required('Необходимо согласиться с правилами')
 })
 
-const initialValues = {fullName: '', email: '', address: '', agreement: false}
+const initialValues = {firstName: '', lastName : '', middleName: '', email: '', address: '', agreement: false}
 
 const {handleSubmit, resetForm, meta} = useForm({
   validationSchema: schema,
   initialValues,
 })
 
-const emit = defineEmits(['makeOrder'])
-
-const onSubmit = handleSubmit((formValues) => {
-  emit('makeOrder', formValues)
+const onSubmit = handleSubmit(async (formValues) => {
+  await makeOrder(formValues)
   closePopup()
 })
 
@@ -55,9 +59,19 @@ function closePopup() {
       <h2 class="popup-header">Данные для заказа</h2>
       <form @submit="onSubmit">
         <label class="form-label">
-          ФИО:
-          <Field name="fullName" type="text"/>
-          <ErrorMessage name="fullName" class="error"/>
+          Фамилия:
+          <Field name="lastName" type="text"/>
+          <ErrorMessage name="lastName" class="error"/>
+        </label>
+        <label class="form-label">
+          Имя:
+          <Field name="firstName" type="text"/>
+          <ErrorMessage name="firstName" class="error"/>
+        </label>
+        <label class="form-label">
+          Отчество:
+          <Field name="middleName" type="text"/>
+          <ErrorMessage name="middleName" class="error"/>
         </label>
 
         <label class="form-label">

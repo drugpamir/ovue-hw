@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import * as yup from "yup";
 import {ErrorMessage, Field, useForm} from "vee-validate";
+import {createProduct} from "@/composables/ProductService.js";
 
 const showPopup = ref(false)
 
@@ -30,10 +31,9 @@ const {handleSubmit, resetForm, meta} = useForm({
   initialValues,
 })
 
-const emit = defineEmits(['createProduct'])
-
-const onSubmit = handleSubmit((formValues) => {
-  emit('createProduct', formValues)
+const onSubmit = handleSubmit(async (formValues) => {
+  const createdProduct = await createProduct(formValues)
+  console.log(`created product: ${createdProduct}`)
   closePopup()
 })
 

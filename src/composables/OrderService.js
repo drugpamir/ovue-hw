@@ -17,7 +17,7 @@ export async function makeOrder(order) {
         const {data} = await api.post("/post", order)
         console.log(data)
         const router = useRouter()
-        router.push("/")
+        await router.push("/")
     } catch (err) {
         error.value = `Ошибка отправки заказа ${err.response?.status}`
     } finally {

@@ -2,17 +2,15 @@
 import {computed, onMounted, reactive} from "vue";
 import Product from "@/components/Product.vue";
 import SearchProduct from "@/components/SearchProduct.vue";
-import {createProduct, error, fetchProducts, loading, products} from "@/composables/ProductService.js";
+import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
 import MakeOrderPopup from "@/components/MakeOrderPopup.vue";
 import CreateProductPopup from "@/components/CreateProductPopup.vue";
-import {makeOrder} from "@/composables/OrderService.js";
 
 onMounted(fetchProducts)
 
 const filters = reactive({
   productTitle: '',
   productMinPrice: 0,
-  productMaxPrice: 100000
 })
 
 function onSearchProduct({title, minPrice, maxPrice}) {
@@ -31,21 +29,12 @@ const filteredProducts = computed(() => {
       (p.price <= filters.productMaxPrice)
   )
 })
-
-async function onProductCreated(ev) {
-  const createdProduct = await createProduct(ev)
-  console.log(`created product: ${createdProduct}`)
-}
-
-async function onMakeOrder(ev) {
-  await makeOrder(ev)
-}
 </script>
 
 <template>
   <SearchProduct @onFilterChange="onSearchProduct"/>
-  <MakeOrderPopup @makeOrder="onMakeOrder($event)"/>
-  <CreateProductPopup @createProduct="onProductCreated($event)"/>
+  <MakeOrderPopup/>
+  <CreateProductPopup/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
   <div v-if="filteredProducts.length" class="products-grid">
