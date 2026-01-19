@@ -1,18 +1,46 @@
 <script setup>
-import {onMounted} from "vue";
+import {computed, onMounted, reactive} from "vue";
 import Product from "@/components/Product.vue";
-import {error, fetchProducts, loading, products} from "@/components/ProductService.js";
+import SearchProduct from "@/components/SearchProduct.vue";
+import {error, fetchProducts, loading, products} from "@/composables/ProductService.js";
+import MakeOrderPopup from "@/components/MakeOrderPopup.vue";
+import CreateProductPopup from "@/components/CreateProductPopup.vue";
 
 onMounted(fetchProducts)
+
+const filters = reactive({
+  productTitle: '',
+  productMinPrice: 0,
+})
+
+function onSearchProduct({title, minPrice, maxPrice}) {
+  filters.productTitle = title
+  filters.productMinPrice = minPrice
+  filters.productMaxPrice = maxPrice
+}
+
+const filteredProducts = computed(() => {
+  if (!products.value.length) {
+    return []
+  }
+  return products.value.filter((p) =>
+      (!filters.productTitle || p.title.toLowerCase().includes(filters.productTitle.toLowerCase())) &&
+      (p.price >= filters.productMinPrice) &&
+      (p.price <= filters.productMaxPrice)
+  )
+})
 </script>
 
 <template>
+  <SearchProduct @onFilterChange="onSearchProduct"/>
+  <MakeOrderPopup/>
+  <CreateProductPopup/>
   <p v-if="loading">Загрузка продуктов...</p>
   <p v-if="error">Ошибка: {{ error }}</p>
-  <div v-if="products.length" class="products-grid">
-    <Product v-for="product in products" :key="product.id" v-bind="product"/>
+  <div v-if="filteredProducts.length" class="products-grid">
+    <Product v-for="product in filteredProducts" :key="product.id" v-bind="product"/>
   </div>
-  <p v-else>Список продуктов пуст!</p>
+  <p v-else-if="!loading">Список продуктов пуст!</p>
 </template>
 
 <style scoped>
